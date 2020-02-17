@@ -7,7 +7,7 @@ class EmployeeProvider extends ChangeNotifier{
   List<EmployeeModel> _data = [];
   List<EmployeeModel> get employeeData => _data;
   Future<List<EmployeeModel>> getEmployee() async {
-    final url = 'http://dummy.restapiexample.com/api/v1/employees';
+    final url = 'http://employee-crud-flutter.daengweb.id/index.php';
     final response = await http.get(url);
 
     if(response.statusCode == 200){
@@ -16,6 +16,21 @@ class EmployeeProvider extends ChangeNotifier{
       return _data;
     }else{
       throw Exception();
+    }
+  }
+  Future<bool> storeEmployee(String name, String salary, String age) async {
+    final url = 'http://employee-crud-flutter.daengweb.id/add.php';
+    final response = await http.post(url, body:{
+      'employee_name':name,
+      'employee_salary':salary,
+      'employee_age':age
+    });
+    final result = json.decode(response.body);
+    if(response.statusCode == 200 && result['status'] == "success"){
+      notifyListeners();
+      return true;
+    }else{
+      return false;
     }
   }
 }

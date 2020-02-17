@@ -1,3 +1,4 @@
+import 'package:employee_crud/pages/employee_add.dart';
 import 'package:employee_crud/providers/employee_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:employee_crud/models/employee_model.dart';
@@ -17,7 +18,7 @@ class Employee extends StatelessWidget {
           style: TextStyle(fontSize: 24),
         ),
         backgroundColor: Colors.pinkAccent,
-        onPressed: (){Navigator.of(context).push(route)},
+        onPressed: (){Navigator.of(context).push(MaterialPageRoute(builder: (context) => EmployeeAdd()));},
       ),
       body: RefreshIndicator(
         onRefresh: () =>
