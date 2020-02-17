@@ -2,19 +2,34 @@ import 'package:employee_crud/pages/employee.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:employee_crud/providers/employee_provider.dart';
-class EmployeeAdd extends StatelessWidget {
+class EmployeeAdd extends StatefulWidget {
+  @override
+  _EmployeeAddState createState() => _EmployeeAddState();
+}
+
+class _EmployeeAddState extends State<EmployeeAdd> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _salary = TextEditingController();
   final TextEditingController _age = TextEditingController();
+  bool _isLoading = false;
 
   void submit(BuildContext context){
-    Provider.of<EmployeeProvider>(context, listen: false).storeEmployee( _name.text, _salary.text, _age.text).then((res) =>{
-      if(res){
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Employee()))
-      }else{
+    if(!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<EmployeeProvider>(context, listen: false).storeEmployee(
+          _name.text, _salary.text, _age.text).then((res) =>
+      {
+        if(res){
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => Employee()))
+        } else
+          {
 //        ALERT
-      }
-    });
+          }
+      });
+    }
   }
 
   @override
@@ -24,7 +39,9 @@ class EmployeeAdd extends StatelessWidget {
         title: Text("Add Employee"),
         actions: <Widget>[
           FlatButton(
-            child: Icon(
+            child:_isLoading? CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ) : Icon(
                 Icons.save,
               color: Colors.white,
             ),
