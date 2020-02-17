@@ -1,7 +1,8 @@
 import 'package:employee_crud/pages/employee.dart';
+import 'package:employee_crud/providers/employee_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:employee_crud/providers/employee_provider.dart';
+
 class EmployeeAdd extends StatefulWidget {
   @override
   _EmployeeAddState createState() => _EmployeeAddState();
@@ -13,21 +14,29 @@ class _EmployeeAddState extends State<EmployeeAdd> {
   final TextEditingController _age = TextEditingController();
   bool _isLoading = false;
 
-  void submit(BuildContext context){
-    if(!_isLoading) {
+  final snackbarKey = GlobalKey<ScaffoldState>();
+  FocusNode salaryNode = FocusNode();
+  FocusNode ageNode = FocusNode();
+
+  void submit(BuildContext context) {
+    if (!_isLoading) {
       setState(() {
         _isLoading = true;
       });
       Provider.of<EmployeeProvider>(context, listen: false).storeEmployee(
-          _name.text, _salary.text, _age.text).then((res) =>
+          _name.text, _salary.text, _age.text).then((res)
       {
-        if(res){
+        if (res) {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => Employee()))
-        } else
-          {
-//        ALERT
-          }
+              MaterialPageRoute(builder: (context) => Employee()));
+        } else {
+          var snackbar = SnackBar(
+            content: Text('Ops, Ada kecelakaan data saat mengirim'),);
+          snackbarKey.currentState.showSnackBar(snackbar);
+          setState(() {
+            _isLoading = false;
+          });
+        }
       });
     }
   }
@@ -35,17 +44,18 @@ class _EmployeeAddState extends State<EmployeeAdd> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: snackbarKey,
       appBar: AppBar(
         title: Text("Add Employee"),
         actions: <Widget>[
           FlatButton(
-            child:_isLoading? CircularProgressIndicator(
+            child: _isLoading ? CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ) : Icon(
-                Icons.save,
+              Icons.save,
               color: Colors.white,
             ),
-            onPressed: () =>{submit(context)},
+            onPressed: () => {submit(context)},
           )
         ],
       ),
@@ -57,15 +67,18 @@ class _EmployeeAddState extends State<EmployeeAdd> {
               controller: _name,
               decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Colors.pinkAccent,
-                  )
+                    borderSide: BorderSide(
+                      color: Colors.pinkAccent,
+                    )
                 ),
                 hintText: "Nama",
               ),
+              onSubmitted: (_) =>
+                  FocusScope.of(context).requestFocus(salaryNode),
             ),
             TextField(
               controller: _salary,
+              focusNode: salaryNode,
               decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
@@ -74,9 +87,11 @@ class _EmployeeAddState extends State<EmployeeAdd> {
                 ),
                 hintText: "Gaji",
               ),
+              onSubmitted: (_) => FocusScope.of(context).requestFocus(ageNode),
             ),
             TextField(
               controller: _age,
+              focusNode: ageNode,
               decoration: InputDecoration(
                 focusedBorder: UnderlineInputBorder(
                     borderSide: BorderSide(
